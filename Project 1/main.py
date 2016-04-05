@@ -78,34 +78,38 @@ def segmentData(groupNumber, dataPoints):
 # define a method to normalize the data
 def preconditionData(dataPoints):    
     print "Normalizing all data points..."
+    
+    N = dataPoints.shape[0] # number of data points
+    D = dataPoints.shape[1] # number of dimension of each data point
+    
     # calculate means and stand deviations for each attribute
-    for i in range(0, 57):
+    for i in range(0, D - 1):
         attribute = []
-        for j in range (0, 4601):
+        for j in range (0, N):
             attribute.append(dataPoints[j][i])
         mu.append(np.mean(attribute))
         sd.append(np.std(attribute))
     
     # normalize every attribute
-    for i in range(0, 57):
-        for j in range (0, 4601):
+    for i in range(0, D - 1):
+        for j in range (0, N):
             dataPoints[j][i] = (dataPoints[j][i] - mu[i]) / sd[i]
             
     # print attribute statistics
     i = 0 
     print "Attribute Statistics:\nAttribute    Mean    Standard Deviation"
-    while(i < 57):
+    while(i < D - 1):
         print '%d        %f        %f' % (i + 1, mu[i], sd[i])
         i += 1
     return dataPoints
     
-# define key learning variables 
-N = 4601  # number of data points
-D = 57  # number of dimension of each data point
-iterations = 500
+# define global constant
+ITERATIONS = 500
 
 # hypothesis = w_1x_1 + w_2x_2 + ... w_nx_n + b, where b is a constant
-def generate_regression_variables(N, D, dataPointsNormalized):
+def generate_regression_variables(dataPointsNormalized):
+    D = dataPointsNormalized.shape[1] - 1 # number of attributes of each data point
+    
     # generate y from dataPointsNormalized
     y = []
     for element in dataPointsNormalized[: , 57:58]:
@@ -119,17 +123,18 @@ def generate_regression_variables(N, D, dataPointsNormalized):
     weights = np.zeros((D + 1)) 
     return weights, X, y 
     
-def stochastic_gradient_descent(N, D, alpha, dataPointsNormalized):
+def stochastic_gradient_descent(alpha, dataPointsNormalized):
     # initialize variables
-    weights, X, y = generate_regression_variables(N, D, dataPointsNormalized)
+    weights, X, y = generate_regression_variables(dataPointsNormalized)
+    N = X.shape[0] # number of data points
     msePrevious = 0
     MSEs = []
     
-    print("\nPerforming linear regression with stochastic gradient descent \nat a %f learning rate with %d data points..." % (alpha, X.shape[0]))
-    for loop in range(0, iterations):
-        for i in range(0, X.shape[0]):     
+    print("\nPerforming linear regression with stochastic gradient descent \nat a %f learning rate with %d data points..." % (alpha, N))
+    for loop in range(0, ITERATIONS):
+        for i in range(0, N):     
             hypothesis = np.dot(X, weights)    
-            weights = weights + alpha * (y - hypothesis)[i] * X[i].transpose()
+            weights = weights + alpha * (y - hypothesis)[i] * X[i]
         
         # calculate the mean squared error (mse)      
         loss = np.dot(X, weights) - y
@@ -145,17 +150,18 @@ def stochastic_gradient_descent(N, D, alpha, dataPointsNormalized):
         msePrevious = mse
     return weights, MSEs
 
-def logistic_stochastic_gradient_descent(N, D, alpha, dataPointsNormalized):
+def logistic_stochastic_gradient_descent(alpha, dataPointsNormalized):
     # initialize variables
-    weights, X, y = generate_regression_variables(N, D, dataPointsNormalized)
+    weights, X, y = generate_regression_variables(dataPointsNormalized)
+    N = X.shape[0] # number of data points
     msePrevious = 0
     MSEs = []
     
-    print("\nPerforming logistic regression with stochastic gradient descent \nat a %.8f learning rate with %d data points..." % (alpha, X.shape[0]))
-    for loop in range(0, iterations):
-        for i in range(0, X.shape[0]):     
+    print("\nPerforming logistic regression with stochastic gradient descent \nat a %.8f learning rate with %d data points..." % (alpha, N))
+    for loop in range(0, ITERATIONS):
+        for i in range(0, N):     
             hypothesis = 1 / (1 + np.exp((-1) * np.dot(X, weights)))    
-            weights = weights + alpha * (y - hypothesis)[i] * X[i].transpose()
+            weights = weights + alpha * (y - hypothesis)[i] * X[i]
         
         # calculate the mean squared error (mse)      
         loss = np.dot(X, weights) - y
@@ -171,18 +177,19 @@ def logistic_stochastic_gradient_descent(N, D, alpha, dataPointsNormalized):
         msePrevious = mse
     return weights, MSEs
 
-def batch_gradient_descent(N, D, alpha, dataPointsNormalized):
+def batch_gradient_descent(alpha, dataPointsNormalized):
     # initialize variables
-    weights, X, y = generate_regression_variables(N, D, dataPointsNormalized)
+    weights, X, y = generate_regression_variables(dataPointsNormalized)
+    N = X.shape[0] # number of data points
     msePrevious = 0
     MSEs = []
     
-    print("\nPerforming linear regression with batch gradient descent \nat a %f learning rate with %d data points..." % (alpha, X.shape[0]))
-    for loop in range(0, iterations):
+    print("\nPerforming linear regression with batch gradient descent \nat a %f learning rate with %d data points..." % (alpha, N))
+    for loop in range(0, ITERATIONS):
         hypothesis = np.dot(X, weights) 
         summation = 0
-        for i in range(0, X.shape[0]):            
-            summation += (y - hypothesis)[i] * X[i].transpose()
+        for i in range(0, N):            
+            summation += (y - hypothesis)[i] * X[i]
         weights = weights + alpha * summation
         
         # calculate the mean squared error (mse)      
@@ -199,18 +206,19 @@ def batch_gradient_descent(N, D, alpha, dataPointsNormalized):
         msePrevious = mse
     return weights, MSEs
 
-def logistic_batch_gradient_descent(N, D, alpha, dataPointsNormalized):
+def logistic_batch_gradient_descent(alpha, dataPointsNormalized):
     # initialize variables
-    weights, X, y = generate_regression_variables(N, D, dataPointsNormalized)
+    weights, X, y = generate_regression_variables(dataPointsNormalized)
+    N = X.shape[0] # number of data points
     msePrevious = 0
     MSEs = []
     
-    print("\nPerforming logistic regression with bath gradient descent \nat a %.8f learning rate with %d data points..." % (alpha, X.shape[0]))
-    for loop in range(0, iterations):
+    print("\nPerforming logistic regression with bath gradient descent \nat a %.8f learning rate with %d data points..." % (alpha, N))
+    for loop in range(0, ITERATIONS):
         hypothesis = 1 / (1 + np.exp((-1) * np.dot(X, weights))) 
         summation = 0
-        for i in range(0, X.shape[0]):            
-            summation += (y - hypothesis)[i] * X[i].transpose()
+        for i in range(0, N):            
+            summation += (y - hypothesis)[i] * X[i]
         weights = weights + alpha * summation
         
         # calculate the mean squared error (mse)      
@@ -248,7 +256,7 @@ if __name__ == '__main__':
     
     # precondition data
     dataPointsNormalized = preconditionData(dataPoints)
-            
+    
     # initialize variables
     mean_tpr = 0.0
     mean_fpr = np.linspace(0, 1, 100)
@@ -261,24 +269,24 @@ if __name__ == '__main__':
         dataPointsTesting, dataPointsTraining = segmentData(i, dataPointsNormalized)
       
         # perform linear regression with stochastic gradient descent
-        weightsSGD1, MSEsSGD1 = stochastic_gradient_descent(N, D, 0.001, dataPointsTraining)
-#         weightsSGD2, MSEsSGD2 = stochastic_gradient_descent(N, D, 0.0001, dataPointsTraining)
-#         weightsSGD3, MSEsSGD3 = stochastic_gradient_descent(N, D, 0.00001, dataPointsTraining)
+        weightsSGD1, MSEsSGD1 = stochastic_gradient_descent(0.001, dataPointsTraining)
+#         weightsSGD2, MSEsSGD2 = stochastic_gradient_descent(0.0001, dataPointsTraining)
+#         weightsSGD3, MSEsSGD3 = stochastic_gradient_descent(0.00001, dataPointsTraining)
            
         # perform logistic regression with stochastic gradient descent
-#         weightsLSGD1, MSEsLSGD1 = logistic_stochastic_gradient_descent(N, D, 0.000001, dataPointsTraining)
-#         weightsLSGD2, MSEsLSGD2 = logistic_stochastic_gradient_descent(N, D, 0.0000001, dataPointsTraining)
-#         weightsLSGD3, MSEsLSGD3 = logistic_stochastic_gradient_descent(N, D, 0.00000001, dataPointsTraining)
+#         weightsLSGD1, MSEsLSGD1 = logistic_stochastic_gradient_descent(0.000001, dataPointsTraining)
+#         weightsLSGD2, MSEsLSGD2 = logistic_stochastic_gradient_descent(0.0000001, dataPointsTraining)
+#         weightsLSGD3, MSEsLSGD3 = logistic_stochastic_gradient_descent(0.00000001, dataPointsTraining)
            
         # perform linear regression with batch gradient descent
-#         weightsBGD1, MSEsBGD1 = batch_gradient_descent(N, D, 0.00001, dataPointsTraining)
-#         weightsBGD2, MSEsBGD2 = batch_gradient_descent(N, D, 0.000001, dataPointsTraining)
-#         weightsBGD3, MSEsBGD3 = batch_gradient_descent(N, D, 0.0000001, dataPointsTraining)
+#         weightsBGD1, MSEsBGD1 = batch_gradient_descent(0.00001, dataPointsTraining)
+#         weightsBGD2, MSEsBGD2 = batch_gradient_descent(0.000001, dataPointsTraining)
+#         weightsBGD3, MSEsBGD3 = batch_gradient_descent(0.0000001, dataPointsTraining)
        
         # perform logistic regression with batch gradient descent
-#         weightsLBGD1, MSEsLBGD1 = logistic_batch_gradient_descent(N, D, 0.000001, dataPointsTraining)
-#         weightsLBGD2, MSEsLBGD2 = logistic_batch_gradient_descent(N, D, 0.0000001, dataPointsTraining)
-#         weightsLBGD3, MSEsLBGD3 = logistic_batch_gradient_descent(N, D, 0.00000001, dataPointsTraining)
+#         weightsLBGD1, MSEsLBGD1 = logistic_batch_gradient_descent(0.000001, dataPointsTraining)
+#         weightsLBGD2, MSEsLBGD2 = logistic_batch_gradient_descent(0.0000001, dataPointsTraining)
+#         weightsLBGD3, MSEsLBGD3 = logistic_batch_gradient_descent(0.00000001, dataPointsTraining)
            
         # generate ROC variables
         fpr, tpr = generate_ROC_variables(dataPointsTesting, weightsSGD1)
@@ -307,14 +315,14 @@ if __name__ == '__main__':
     # plot SGD learning curves
     # perform linear regression with stochastic gradient descent
     print("\nNow plotting different stochastic gradient descent learning curves...")
-    weightsSGD1, MSEsSGD1 = stochastic_gradient_descent(N, D, 0.001, dataPointsNormalized)
-    weightsSGD2, MSEsSGD2 = stochastic_gradient_descent(N, D, 0.0001, dataPointsNormalized)
-    weightsSGD3, MSEsSGD3 = stochastic_gradient_descent(N, D, 0.00001, dataPointsNormalized)
+    weightsSGD1, MSEsSGD1 = stochastic_gradient_descent(0.001, dataPointsNormalized)
+    weightsSGD2, MSEsSGD2 = stochastic_gradient_descent(0.0001, dataPointsNormalized)
+    weightsSGD3, MSEsSGD3 = stochastic_gradient_descent(0.00001, dataPointsNormalized)
          
     # perform logistic regression with stochastic gradient descent
-#     weightsLSGD1, MSEsLSGD1 = logistic_stochastic_gradient_descent(N, D, 0.000001, dataPointsNormalized)
-#     weightsLSGD2, MSEsLSGD2 = logistic_stochastic_gradient_descent(N, D, 0.0000001, dataPointsNormalized)
-#     weightsLSGD3, MSEsLSGD3 = logistic_stochastic_gradient_descent(N, D, 0.00000001, dataPointsNormalized)
+#     weightsLSGD1, MSEsLSGD1 = logistic_stochastic_gradient_descent(0.000001, dataPointsNormalized)
+#     weightsLSGD2, MSEsLSGD2 = logistic_stochastic_gradient_descent(0.0000001, dataPointsNormalized)
+#     weightsLSGD3, MSEsLSGD3 = logistic_stochastic_gradient_descent(0.00000001, dataPointsNormalized)
 
     plotSGD = plt.subplot()
     plotSGD.set_title("Stochastic Gradient Descent Learning Curve")
@@ -330,14 +338,14 @@ if __name__ == '__main__':
     # plot BGD learning curves
     # perform linear regression with batch gradient descent
 #     print("\nNow plotting different batch gradient descent learning curves...")
-#     weightsBGD1, MSEsBGD1 = batch_gradient_descent(N, D, 0.00001, dataPointsNormalized)
-#     weightsBGD2, MSEsBGD2 = batch_gradient_descent(N, D, 0.000001, dataPointsNormalized)
-#     weightsBGD3, MSEsBGD3 = batch_gradient_descent(N, D, 0.0000001, dataPointsNormalized)
+#     weightsBGD1, MSEsBGD1 = batch_gradient_descent(0.00001, dataPointsNormalized)
+#     weightsBGD2, MSEsBGD2 = batch_gradient_descent(0.000001, dataPointsNormalized)
+#     weightsBGD3, MSEsBGD3 = batch_gradient_descent(0.0000001, dataPointsNormalized)
      
     # perform logistic regression with batch gradient descent
-#     weightsLBGD1, MSEsLBGD1 = logistic_batch_gradient_descent(N, D, 0.000001, dataPointsNormalized)
-#     weightsLBGD2, MSEsLBGD2 = logistic_batch_gradient_descent(N, D, 0.0000001, dataPointsNormalized)
-#     weightsLBGD3, MSEsLBGD3 = logistic_batch_gradient_descent(N, D, 0.00000001, dataPointsNormalized)
+#     weightsLBGD1, MSEsLBGD1 = logistic_batch_gradient_descent(0.000001, dataPointsNormalized)
+#     weightsLBGD2, MSEsLBGD2 = logistic_batch_gradient_descent(0.0000001, dataPointsNormalized)
+#     weightsLBGD3, MSEsLBGD3 = logistic_batch_gradient_descent(0.00000001, dataPointsNormalized)
     
 #     plotBGD = plt.subplot()
 #     plotBGD.set_title("Batch Gradient Descent Learning Curve")
