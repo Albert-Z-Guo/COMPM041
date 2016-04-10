@@ -1,0 +1,11 @@
+fine diamonds
+5 5 4 4 4
+10	deBeers
+10	Angara
+10	thediamondsfactory.com
+10	Liori Diamonds
+10	Windsor Jewelers
+10	Walmart
+8	The Jewelry Exchange
+7	Dave's Jewelers
+2	Baublebox

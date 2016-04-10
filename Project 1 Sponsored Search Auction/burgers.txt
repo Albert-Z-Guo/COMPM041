@@ -1,0 +1,6 @@
+cheap burgers
+10 8 7 5
+5	Bulk Foods Club
+4	5 Guys Burgers and Fries
+15	Burger King
+12	McDonald FFast Foods

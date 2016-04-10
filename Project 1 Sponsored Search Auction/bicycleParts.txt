@@ -1,0 +1,11 @@
+bicycle parts
+10 8 7 5 1.5 
+5	Rick's RollerRama
+3	K-mart
+.02	EBay random plugs for anything Corp
+.01	EBay stupid plugs for random stuff Corp
+2	Bike Shop Bob
+.1	Viagra Cycle Supplies Inc
+.01	EBay goofy ads for nothing in particular Corp
+15	LiveStrong
+12	Schwinn Supplies
