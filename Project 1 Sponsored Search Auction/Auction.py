@@ -25,11 +25,16 @@ class Auction:
 	def executeVCG(self, slots):		
 		# set the range and the base price
 		if len(slots) >= len(self.bids):
-			length = len(self.bids)  # if available bids are fewer than available slots
-			slots[length - 1].price = 0  # set the base price
+			length = len(self.bids)  # if available bids are fewer than or equal to available slots
+			slots[length - 1].price = 0  # set the price of the last slot (base price) to 0
 		else:
-			length = len(slots)  # if available slots are fewer than available bids
-			slots[-1].price = slots[-1].clickThruRate * self.bids[length].value  # set the base price
+			'''
+			if available slots are fewer than available bids, set the price of the last slot
+			(base price) to the click-through rate of the last slot * the bid just lower than
+			the bid of the last slot
+			'''
+			length = len(slots)	# the index 1 greater than the index of the last slot
+			slots[-1].price = slots[-1].clickThruRate * self.bids[length].value
 
 		# price_VCG_i = (Click_i-Click_(i+1))*Bid_(i+1) + price_VCG_(i+1)
 		for i in range(length - 1, 0, -1):
