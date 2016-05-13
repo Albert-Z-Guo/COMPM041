@@ -10,11 +10,9 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 
 # define global variables
-dataPoint = []  # array of data point
+dataPoint = []  # array of each data point
 dataPoints = np.zeros(4601)  # numpy array of total data points
 dataPointsNormalized = np.zeros(4601)  # numpy array of processed data points
-mu = []  # array of mean for each attribute (58 attributes in total)
-sd = []  # array of standard deviations for each attribute (58 attributes in total)
 
 # define a method to read the data from file
 def loadData(filename):
@@ -45,7 +43,7 @@ def loadData(filename):
          
         # update i
         i += 1
-    print("The total number of data points read is %d\n" % (len(dataPoints)))
+    print("The total number of data points read is %d.\n" % (len(dataPoints)))
     return dataPoints
 
 # define a method to segment the data to 10 groups
@@ -79,8 +77,10 @@ def segmentData(groupNumber, dataPoints):
 def preconditionData(dataPoints):    
     print "Normalizing all data points..."
     
-    N = dataPoints.shape[0] # number of data points
-    D = dataPoints.shape[1] # number of dimension of each data point
+    N = dataPoints.shape[0]  # number of data points
+    D = dataPoints.shape[1]  # number of dimensions of each data point
+    mu = []  # array of means for each attribute (58 attributes in total)
+    sd = []  # array of standard deviations for each attribute (58 attributes in total)
     
     # calculate means and stand deviations for each attribute
     for i in range(0, D - 1):
@@ -108,7 +108,7 @@ ITERATIONS = 500
 
 # hypothesis = w_1x_1 + w_2x_2 + ... w_nx_n + b, where b is a constant
 def generate_regression_variables(dataPointsNormalized):
-    D = dataPointsNormalized.shape[1] - 1 # number of attributes of each data point
+    D = dataPointsNormalized.shape[1] - 1  # number of attributes of each data point
     
     # generate y from dataPointsNormalized
     y = []
@@ -126,7 +126,7 @@ def generate_regression_variables(dataPointsNormalized):
 def stochastic_gradient_descent(alpha, dataPointsNormalized):
     # initialize variables
     weights, X, y = generate_regression_variables(dataPointsNormalized)
-    N = X.shape[0] # number of data points
+    N = X.shape[0]  # number of data points
     msePrevious = 0
     MSEs = []
     
@@ -153,7 +153,7 @@ def stochastic_gradient_descent(alpha, dataPointsNormalized):
 def logistic_stochastic_gradient_descent(alpha, dataPointsNormalized):
     # initialize variables
     weights, X, y = generate_regression_variables(dataPointsNormalized)
-    N = X.shape[0] # number of data points
+    N = X.shape[0]  # number of data points
     msePrevious = 0
     MSEs = []
     
@@ -180,7 +180,7 @@ def logistic_stochastic_gradient_descent(alpha, dataPointsNormalized):
 def batch_gradient_descent(alpha, dataPointsNormalized):
     # initialize variables
     weights, X, y = generate_regression_variables(dataPointsNormalized)
-    N = X.shape[0] # number of data points
+    N = X.shape[0]  # number of data points
     msePrevious = 0
     MSEs = []
     
@@ -209,7 +209,7 @@ def batch_gradient_descent(alpha, dataPointsNormalized):
 def logistic_batch_gradient_descent(alpha, dataPointsNormalized):
     # initialize variables
     weights, X, y = generate_regression_variables(dataPointsNormalized)
-    N = X.shape[0] # number of data points
+    N = X.shape[0]  # number of data points
     msePrevious = 0
     MSEs = []
     
@@ -359,6 +359,3 @@ if __name__ == '__main__':
 #     plotBGD.plot(np.arange(0, len(MSEsLBGD3)), MSEsLBGD3, 'o', color='b', label='Learning Rate 0.00000001')
     plt.legend()
     plt.show()
-    
-    
-        
