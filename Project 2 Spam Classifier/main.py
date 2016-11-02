@@ -63,13 +63,13 @@ def segmentData(groupNumber, dataPoints):
             dataPointsTesting = np.zeros_like(dataPoints[0])
             j = 0
             while ((groupNumber + j) <= 4601):
-                dataPointsTesting = np.vstack((dataPointsTesting, dataPoints[groupNumber - 1 + j]))
+                dataPointsTesting = np.vstack((dataPointsTesting, dataPoints[groupNumber + j - 1]))
                 j += 10
         
         if (n != groupNumber):
             i = 0
             while ((n + i) <= 4601):
-                dataPointsTraining = np.vstack((dataPointsTraining, dataPoints[n - 1 + i]))
+                dataPointsTraining = np.vstack((dataPointsTraining, dataPoints[n + i - 1]))
                 i += 10
     return dataPointsTesting[1: , :], dataPointsTraining[1: , :]
 
@@ -103,7 +103,7 @@ def preconditionData(dataPoints):
         i += 1
     return dataPoints
     
-# define global constant
+# define a global constant
 ITERATIONS = 500
 
 # hypothesis = w_1x_1 + w_2x_2 + ... w_nx_n + b, where b is a constant
